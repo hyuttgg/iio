@@ -225,6 +225,54 @@
             <div class="spooky-quote" id="spookyQuote">"Come into my parlor," said the spider...</div>
         </div>
 
+        <!-- ===== COUNTDOWN TIMER PANEL ===== -->
+        <div class="timer-panel" id="timerPanel">
+            <div class="timer-header">
+                <span class="timer-icon">⏳</span>
+                <span class="timer-title">SPIDER TIMER</span>
+                <span class="timer-icon">🕷️</span>
+            </div>
+
+            <!-- Timer Display -->
+            <div class="timer-display" id="timerDisplay">00:00:00</div>
+
+            <!-- Alarm ringing overlay -->
+            <div class="alarm-overlay" id="alarmOverlay">
+                <div class="alarm-text">🔔 TIME'S UP! 🔔</div>
+                <button type="button" class="btn btn-dismiss" id="btnDismiss">SILENCE THE BEAST</button>
+            </div>
+
+            <!-- Inputs -->
+            <div class="timer-inputs" id="timerInputs">
+                <div class="time-input-group">
+                    <input type="number" id="inputHours"   class="time-input" value="0" min="0" max="23" placeholder="0">
+                    <label class="time-label">HRS</label>
+                </div>
+                <span class="time-sep">:</span>
+                <div class="time-input-group">
+                    <input type="number" id="inputMinutes" class="time-input" value="5" min="0" max="59" placeholder="0">
+                    <label class="time-label">MIN</label>
+                </div>
+                <span class="time-sep">:</span>
+                <div class="time-input-group">
+                    <input type="number" id="inputSeconds" class="time-input" value="0" min="0" max="59" placeholder="0">
+                    <label class="time-label">SEC</label>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="timer-controls">
+                <button type="button" class="btn btn-start"  id="btnStart">&#9654; START</button>
+                <button type="button" class="btn btn-pause"  id="btnPause"  disabled>&#9208; PAUSE</button>
+                <button type="button" class="btn btn-reset"  id="btnReset">&#8634; RESET</button>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="timer-progress-track">
+                <div class="timer-progress-bar" id="timerProgressBar"></div>
+            </div>
+        </div>
+
         <!-- Bats -->
         <div class="bat bat1" id="bat1">
             <div class="bat-wing left-wing"></div>
@@ -243,6 +291,9 @@
         </div>
 
     </div>
+
+    <!-- Alarm audio -->
+    <audio id="alarmAudio" src="../tieng_cu_meo-www_tiengdong_com.mp3" preload="auto" loop></audio>
 
     <script src="main.js"></script>
 </body>
