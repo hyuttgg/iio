@@ -403,6 +403,196 @@
         });
     }
 
+    // ===== COUNTDOWN TIMER =====
+    function initTimer() {
+        const alarmAudio    = document.getElementById('alarmAudio');
+        const timerDisplay  = document.getElementById('timerDisplay');
+        const timerInputs   = document.getElementById('timerInputs');
+        const alarmOverlay  = document.getElementById('alarmOverlay');
+        const progressBar   = document.getElementById('timerProgressBar');
+        const btnStart      = document.getElementById('btnStart');
+        const btnPause      = document.getElementById('btnPause');
+        const btnReset      = document.getElementById('btnReset');
+        const btnDismiss    = document.getElementById('btnDismiss');
+        const sceneEl       = document.querySelector('.scene');
+
+        let totalSeconds   = 0;   // set when START is pressed
+        let remainSeconds  = 0;
+        let intervalId     = null;
+        let running        = false;
+        let alarmActive    = false;
+
+        // ---- helpers ----
+        function pad(n) { return String(n).padStart(2, '0'); }
+
+        function formatTime(sec) {
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            return `${pad(h)}:${pad(m)}:${pad(s)}`;
+        }
+
+        function readInputs() {
+            const h = Math.max(0, parseInt(document.getElementById('inputHours').value)   || 0);
+            const m = Math.max(0, parseInt(document.getElementById('inputMinutes').value) || 0);
+            const s = Math.max(0, parseInt(document.getElementById('inputSeconds').value) || 0);
+            return h * 3600 + m * 60 + s;
+        }
+
+        function setInputsDisabled(disabled) {
+            ['inputHours', 'inputMinutes', 'inputSeconds'].forEach(id => {
+                document.getElementById(id).disabled = disabled;
+            });
+        }
+
+        function updateProgressBar() {
+            const pct = totalSeconds > 0 ? (remainSeconds / totalSeconds) * 100 : 100;
+            progressBar.style.width = pct + '%';
+        }
+
+        function triggerAlarm() {
+            alarmActive = true;
+            timerDisplay.classList.add('urgent');
+            alarmOverlay.classList.add('active');
+            sceneEl.classList.add('alarm-ringing');
+
+            // Play the cat-meow alarm on loop
+            alarmAudio.currentTime = 0;
+            alarmAudio.play().catch(() => {});
+
+            // Flash spider eyes red continuously while alarm is active
+            const alarmEyeInterval = setInterval(() => {
+                if (!alarmActive) { clearInterval(alarmEyeInterval); return; }
+                [eyeLeft, eyeRight].forEach(eye => {
+                    eye.style.background = 'radial-gradient(circle at 30% 30%, #ff4400, #8b0000)';
+                    eye.style.boxShadow  = '0 0 28px rgba(255,0,0,0.95), 0 0 56px rgba(139,0,0,0.7)';
+                });
+            }, 600);
+            // Store interval ref for dismissal
+            alarmAudio._eyeInterval = alarmEyeInterval;
+
+            // Shake clock repeatedly while alarm is active
+            const alarmShakeInterval = setInterval(() => {
+                if (!alarmActive) { clearInterval(alarmShakeInterval); return; }
+                clockEl.style.animation = 'spiderShake 0.5s ease-in-out';
+                setTimeout(() => { if (clockEl) clockEl.style.animation = ''; }, 500);
+            }, 1200);
+            alarmAudio._shakeInterval = alarmShakeInterval;
+        }
+
+        function dismissAlarm() {
+            alarmActive = false;
+            alarmAudio.pause();
+            alarmAudio.currentTime = 0;
+
+            // Clear eye-flash & shake intervals stored on the audio element
+            clearInterval(alarmAudio._eyeInterval);
+            clearInterval(alarmAudio._shakeInterval);
+
+            // Restore eye styling
+            [eyeLeft, eyeRight].forEach(eye => {
+                eye.style.background = '';
+                eye.style.boxShadow  = '';
+            });
+
+            alarmOverlay.classList.remove('active');
+            timerDisplay.classList.remove('urgent');
+            sceneEl.classList.remove('alarm-ringing');
+        }
+
+        function tick() {
+            if (remainSeconds <= 0) {
+                clearInterval(intervalId);
+                intervalId = null;
+                running    = false;
+                remainSeconds = 0;
+                timerDisplay.textContent = '00:00:00';
+                progressBar.style.width = '0%';
+                setInputsDisabled(false);
+                btnStart.disabled = false;
+                btnPause.disabled = true;
+                triggerAlarm();
+                return;
+            }
+            remainSeconds--;
+            timerDisplay.textContent = formatTime(remainSeconds);
+            updateProgressBar();
+
+            // Urgent styling when ≤ 10 seconds remain
+            if (remainSeconds <= 10) {
+                timerDisplay.classList.add('urgent');
+            }
+        }
+
+        // ---- Button handlers ----
+        btnStart.addEventListener('click', () => {
+            if (running) return;
+
+            if (!alarmActive && remainSeconds === 0) {
+                // Fresh start — read inputs
+                const secs = readInputs();
+                if (secs <= 0) return;
+                totalSeconds  = secs;
+                remainSeconds = secs;
+            }
+
+            dismissAlarm();   // dismiss any lingering alarm
+
+            setInputsDisabled(true);
+            btnStart.disabled = true;
+            btnPause.disabled = false;
+            running = true;
+
+            timerDisplay.textContent = formatTime(remainSeconds);
+            updateProgressBar();
+            intervalId = setInterval(tick, 1000);
+        });
+
+        btnPause.addEventListener('click', () => {
+            if (!running) return;
+            clearInterval(intervalId);
+            intervalId = null;
+            running    = false;
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+        });
+
+        btnReset.addEventListener('click', () => {
+            clearInterval(intervalId);
+            intervalId = null;
+            running    = false;
+            dismissAlarm();
+
+            remainSeconds = 0;
+            totalSeconds  = 0;
+            timerDisplay.textContent = '00:00:00';
+            timerDisplay.classList.remove('urgent');
+            progressBar.style.width = '100%';
+            setInputsDisabled(false);
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+        });
+
+        btnDismiss.addEventListener('click', () => {
+            dismissAlarm();
+            // Reset display so user can set a new timer
+            remainSeconds = 0;
+            totalSeconds  = 0;
+            timerDisplay.textContent = '00:00:00';
+            progressBar.style.width = '100%';
+            setInputsDisabled(false);
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+        });
+
+        // Allow Enter key on inputs to start timer
+        ['inputHours', 'inputMinutes', 'inputSeconds'].forEach(id => {
+            document.getElementById(id).addEventListener('keydown', e => {
+                if (e.key === 'Enter') btnStart.click();
+            });
+        });
+    }
+
     // ===== INITIALIZE =====
     function init() {
         createMarkers();
@@ -415,6 +605,7 @@
         initHangingSpider();
         showHandLabels();
         updateClock();
+        initTimer();
     }
 
     if (document.readyState === 'loading') {
