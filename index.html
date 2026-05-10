@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A spooky Halloween spider clock where spider legs serve as clock hands — hauntingly beautiful.">
+    <title>🕷️ Spider Clock — Halloween</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="scene">
+
+        <!-- Floating dust particles -->
+        <div class="particles" id="particles"></div>
+
+        <!-- Cobweb corners -->
+        <svg class="cobweb cobweb-tl" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 0 Q110 15 220 220" stroke="rgba(255,255,255,0.09)" stroke-width="1.2"/>
+            <path d="M0 0 Q55 55 110 220" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+            <path d="M0 0 Q15 110 220 220" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <path d="M0 0 L220 220" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"/>
+            <path d="M0 60 Q90 90 160 220" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+            <path d="M60 0 Q90 70 220 160" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+            <!-- Cross threads -->
+            <path d="M22 12 Q65 35 12 68" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+            <path d="M55 28 Q110 68 35 120" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+            <path d="M100 45 Q155 100 58 175" stroke="rgba(255,255,255,0.03)" stroke-width="0.5"/>
+        </svg>
+        <svg class="cobweb cobweb-tr" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M220 0 Q110 15 0 220" stroke="rgba(255,255,255,0.09)" stroke-width="1.2"/>
+            <path d="M220 0 Q165 55 110 220" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+            <path d="M220 0 Q205 110 0 220" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <path d="M220 0 L0 220" stroke="rgba(255,255,255,0.06)" stroke-width="0.6"/>
+            <path d="M198 12 Q155 35 208 68" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+            <path d="M165 28 Q110 68 185 120" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+        </svg>
+
+        <!-- Hanging spider (decorative) -->
+        <div class="hanging-spider" id="hangingSpider">
+            <div class="spider-thread"></div>
+            <div class="mini-spider">
+                <div class="mini-spider-body">
+                    <div class="mini-eye left"></div>
+                    <div class="mini-eye right"></div>
+                </div>
+                <div class="mini-legs">
+                    <div class="mini-leg ml1"></div>
+                    <div class="mini-leg ml2"></div>
+                    <div class="mini-leg ml3"></div>
+                    <div class="mini-leg ml4"></div>
+                    <div class="mini-leg mr1"></div>
+                    <div class="mini-leg mr2"></div>
+                    <div class="mini-leg mr3"></div>
+                    <div class="mini-leg mr4"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main clock -->
+        <div class="clock-container">
+            <h1 class="title">SPIDER CLOCK</h1>
+
+            <div class="clock-wrapper">
+                <!-- Spider web behind clock -->
+                <svg class="spider-web" viewBox="0 0 500 500" id="spiderWeb"></svg>
+
+                <div class="clock" id="clock">
+                    <div class="clock-glow"></div>
+
+                    <!-- Hour markers -->
+                    <div class="markers" id="markers"></div>
+
+                    <!-- ===== HOUR HAND — Spider Leg ===== -->
+                    <!--
+                        The hour hand is a full segmented spider leg:
+                        root (at center) → seg1 (thick thigh) → joint1 → seg2 (shin) → joint2 → seg3 (tarsus) → claw tips
+                        It rotates from transform-origin at the center (0 0 with translate hack).
+                    -->
+                    <div class="hand hour-hand" id="hourHand">
+                        <svg class="leg-svg hour-leg-svg" viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Hairy bristles -->
+                            <line x1="8"  y1="14" x2="6"  y2="7"  stroke="rgba(100,80,140,0.5)" stroke-width="0.7"/>
+                            <line x1="20" y1="14" x2="18" y2="6"  stroke="rgba(100,80,140,0.5)" stroke-width="0.7"/>
+                            <line x1="34" y1="14" x2="33" y2="5"  stroke="rgba(100,80,140,0.5)" stroke-width="0.7"/>
+                            <line x1="8"  y1="14" x2="6"  y2="21" stroke="rgba(100,80,140,0.4)" stroke-width="0.7"/>
+                            <line x1="22" y1="14" x2="20" y2="22" stroke="rgba(100,80,140,0.4)" stroke-width="0.7"/>
+                            <!-- Seg 1 — thigh -->
+                            <path d="M0 14 C10 10 36 10 45 14 C36 18 10 18 0 14Z"
+                                  fill="url(#hourGrad1)"/>
+                            <!-- Joint 1 -->
+                            <circle cx="45" cy="14" r="5.5" fill="url(#jointGrad)" stroke="rgba(200,100,255,0.4)" stroke-width="0.8"/>
+                            <!-- Seg 2 — shin (angled slightly) -->
+                            <path d="M45 14 C55 10 74 9 82 13 C74 17 55 18 45 14Z"
+                                  fill="url(#hourGrad2)"/>
+                            <!-- Joint 2 -->
+                            <circle cx="82" cy="13" r="4" fill="url(#jointGrad)" stroke="rgba(200,100,255,0.35)" stroke-width="0.7"/>
+                            <!-- Seg 3 — tarsus -->
+                            <path d="M82 13 C88 10 102 10 108 13 C102 16 88 16 82 13Z"
+                                  fill="url(#hourGrad3)"/>
+                            <!-- Claw tips -->
+                            <path d="M108 13 Q116 8 120 5" stroke="url(#clawGrad)" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                            <path d="M108 13 Q115 13 119 12" stroke="url(#clawGrad)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                            <path d="M108 13 Q116 18 120 21" stroke="url(#clawGrad)" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+                            <defs>
+                                <linearGradient id="hourGrad1" x1="0" y1="0" x2="45" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#2d2d4a"/>
+                                    <stop offset="100%" stop-color="#4a3a6a"/>
+                                </linearGradient>
+                                <linearGradient id="hourGrad2" x1="45" y1="0" x2="82" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#4a3a6a"/>
+                                    <stop offset="100%" stop-color="#5a2a7a"/>
+                                </linearGradient>
+                                <linearGradient id="hourGrad3" x1="82" y1="0" x2="108" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#5a2a7a"/>
+                                    <stop offset="100%" stop-color="#3a1a5a"/>
+                                </linearGradient>
+                                <radialGradient id="jointGrad" cx="40%" cy="35%">
+                                    <stop offset="0%" stop-color="#8a60cc"/>
+                                    <stop offset="100%" stop-color="#2a1a3e"/>
+                                </radialGradient>
+                                <linearGradient id="clawGrad" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#ff8800"/>
+                                    <stop offset="100%" stop-color="#ff4400"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <!-- ===== MINUTE HAND — Slender Spider Leg ===== -->
+                    <div class="hand minute-hand" id="minuteHand">
+                        <svg class="leg-svg minute-leg-svg" viewBox="0 0 160 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Bristles -->
+                            <line x1="10" y1="11" x2="8"  y2="5"  stroke="rgba(80,150,80,0.45)" stroke-width="0.6"/>
+                            <line x1="28" y1="11" x2="26" y2="4"  stroke="rgba(80,150,80,0.45)" stroke-width="0.6"/>
+                            <line x1="50" y1="11" x2="49" y2="4"  stroke="rgba(80,150,80,0.4)"  stroke-width="0.6"/>
+                            <line x1="70" y1="11" x2="69" y2="4"  stroke="rgba(80,150,80,0.35)" stroke-width="0.6"/>
+                            <line x1="10" y1="11" x2="8"  y2="17" stroke="rgba(80,150,80,0.35)" stroke-width="0.6"/>
+                            <line x1="30" y1="11" x2="28" y2="18" stroke="rgba(80,150,80,0.35)" stroke-width="0.6"/>
+                            <!-- Seg 1 -->
+                            <path d="M0 11 C12 8 48 8 58 11 C48 14 12 14 0 11Z"
+                                  fill="url(#minGrad1)"/>
+                            <!-- Joint 1 -->
+                            <circle cx="58" cy="11" r="4.5" fill="url(#minJoint)" stroke="rgba(57,255,20,0.35)" stroke-width="0.7"/>
+                            <!-- Seg 2 -->
+                            <path d="M58 11 C66 8 96 8 106 11 C96 14 66 14 58 11Z"
+                                  fill="url(#minGrad2)"/>
+                            <!-- Joint 2 -->
+                            <circle cx="106" cy="11" r="3.5" fill="url(#minJoint)" stroke="rgba(57,255,20,0.3)" stroke-width="0.6"/>
+                            <!-- Seg 3 -->
+                            <path d="M106 11 C112 9 132 9 140 11 C132 13 112 13 106 11Z"
+                                  fill="url(#minGrad3)"/>
+                            <!-- Joint 3 -->
+                            <circle cx="140" cy="11" r="2.8" fill="url(#minJoint)" stroke="rgba(57,255,20,0.25)" stroke-width="0.5"/>
+                            <!-- Seg 4 — tiny tip -->
+                            <path d="M140 11 C144 9.5 152 9.5 155 11 C152 12.5 144 12.5 140 11Z"
+                                  fill="url(#minGrad4)"/>
+                            <!-- Claw tips -->
+                            <path d="M155 11 Q161 7 160 4"  stroke="url(#minClaw)" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+                            <path d="M155 11 Q160 11 160 9" stroke="url(#minClaw)" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                            <path d="M155 11 Q161 15 160 18" stroke="url(#minClaw)" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+
+                            <defs>
+                                <linearGradient id="minGrad1" x1="0" y1="0" x2="58" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#1a2e1a"/>
+                                    <stop offset="100%" stop-color="#2a4a2a"/>
+                                </linearGradient>
+                                <linearGradient id="minGrad2" x1="58" y1="0" x2="106" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#2a4a2a"/>
+                                    <stop offset="100%" stop-color="#1a3a2a"/>
+                                </linearGradient>
+                                <linearGradient id="minGrad3" x1="106" y1="0" x2="140" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#1a3a2a"/>
+                                    <stop offset="100%" stop-color="#0d2a1a"/>
+                                </linearGradient>
+                                <linearGradient id="minGrad4" x1="140" y1="0" x2="155" y2="0" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0%" stop-color="#0d2a1a"/>
+                                    <stop offset="100%" stop-color="#05150d"/>
+                                </linearGradient>
+                                <radialGradient id="minJoint" cx="40%" cy="35%">
+                                    <stop offset="0%" stop-color="#39ff14"/>
+                                    <stop offset="60%" stop-color="#0a4a10"/>
+                                    <stop offset="100%" stop-color="#061a08"/>
+                                </radialGradient>
+                                <linearGradient id="minClaw" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#8b0000"/>
+                                    <stop offset="100%" stop-color="#cc0000"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <!-- ===== SECOND HAND — Silk thread ===== -->
+                    <div class="hand second-hand" id="secondHand">
+                        <div class="silk-thread"></div>
+                        <div class="silk-counter"></div>
+                    </div>
+
+                    <!-- Spider body at center -->
+                    <div class="spider-center">
+                        <div class="spider-body">
+                            <div class="spider-head">
+                                <div class="spider-eye left" id="eyeLeft"><div class="pupil"></div></div>
+                                <div class="spider-eye right" id="eyeRight"><div class="pupil"></div></div>
+                                <div class="spider-fang left"></div>
+                                <div class="spider-fang right"></div>
+                            </div>
+                            <div class="spider-abdomen"></div>
+                        </div>
+                    </div>
+
+                    <!-- Decorative 8 legs radiating from body -->
+                    <div class="deco-legs" id="decoLegs"></div>
+
+                    <!-- Center cap -->
+                    <div class="center-cap"></div>
+                </div>
+            </div>
+
+            <!-- Digital time -->
+            <div class="digital-time" id="digitalTime">00:00:00</div>
+            <div class="date-display" id="dateDisplay">HALLOWEEN NIGHT</div>
+            <div class="spooky-quote" id="spookyQuote">"Come into my parlor," said the spider...</div>
+        </div>
+
+        <!-- Bats -->
+        <div class="bat bat1" id="bat1">
+            <div class="bat-wing left-wing"></div>
+            <div class="bat-body"></div>
+            <div class="bat-wing right-wing"></div>
+        </div>
+        <div class="bat bat2" id="bat2">
+            <div class="bat-wing left-wing"></div>
+            <div class="bat-body"></div>
+            <div class="bat-wing right-wing"></div>
+        </div>
+        <div class="bat bat3" id="bat3">
+            <div class="bat-wing left-wing"></div>
+            <div class="bat-body"></div>
+            <div class="bat-wing right-wing"></div>
+        </div>
+
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
